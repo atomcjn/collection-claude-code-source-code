@@ -22,7 +22,7 @@
 
 ![demo](demo.gif)
 
-A minimal Python implementation of Claude Code in ~1300 lines, supporting Claude, GPT, Gemini, Kimi, Qwen, Zhipu, DeepSeek, and local open-source models via Ollama or any OpenAI-compatible endpoint.
+A minimal Python implementation of Claude Code in ~1300 lines, **supporting Claude, GPT, Gemini, Kimi, Qwen, Zhipu, DeepSeek, and local open-source models via Ollama or any OpenAI-compatible endpoint.**
 
 ---
 
