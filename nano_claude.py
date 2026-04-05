@@ -165,7 +165,12 @@ def stream_text(chunk: str) -> None:
 
 def stream_thinking(chunk: str, verbose: bool):
     if verbose:
-        print(clr(chunk, "dim"), end="", flush=True)
+        # Strip internal newlines when models stream token-by-token (like Qwen).
+        clean_chunk = chunk.replace("\n", " ")
+        if clean_chunk:
+            # We explicitly do NOT use clr() wrapper here to avoid outputting \033[0m (reset)
+            # after every single token. Repeated ANSI resets can cause formatting glitches and vertical cascades.
+            print(f"{C['dim']}{clean_chunk}", end="", flush=True)
 
 def flush_response() -> None:
     """Commit buffered text to screen: stop Live (freezes rendered Markdown in place)."""
@@ -1547,13 +1552,16 @@ def repl(config: dict, initial_prompt: str = None):
 
             for event in run(user_input, state, config, system_prompt):
                 if isinstance(event, TextChunk):
+                    if thinking_started:
+                        print("\n")  # Break the line after the thinking block finishes
+                        thinking_started = False
                     # stream_text auto-starts Live on first chunk when Rich available
                     stream_text(event.text)
 
                 elif isinstance(event, ThinkingChunk):
                     if verbose:
-                        flush_response()  # stop Live before printing static thinking
                         if not thinking_started:
+                            flush_response()  # stop Live before printing static thinking
                             print(clr("\n  [thinking]", "dim"))
                             thinking_started = True
                         stream_thinking(event.text, verbose)
